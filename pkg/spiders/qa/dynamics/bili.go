@@ -3,6 +3,7 @@ package dynamics
 import (
 	"fmt"
 	"go.uber.org/zap"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -35,7 +36,7 @@ func getQADynamicAPI(pn int, ps int, log *zap.Logger) (string, error) {
 
 }
 
-func getArticle(id string, log *zap.Logger) (string, error) {
+func getArticle(id string, log *zap.Logger) (io.ReadCloser, error) {
 	url := "https://www.bilibili.com/read/cv" + id
 	method := "GET"
 
@@ -44,19 +45,12 @@ func getArticle(id string, log *zap.Logger) (string, error) {
 
 	if err != nil {
 		log.Error("new request", zap.Error(err))
-		return "", err
+		return nil, err
 	}
 	res, err := client.Do(req)
 	if err != nil {
 		log.Error("do", zap.Error(err))
-		return "", err
+		return nil, err
 	}
-	defer res.Body.Close()
-
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		log.Error("read", zap.Error(err))
-		return "", err
-	}
-	return string(body), nil
+	return res.Body, nil
 }

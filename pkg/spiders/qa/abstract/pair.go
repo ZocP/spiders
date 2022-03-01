@@ -1,7 +1,7 @@
 package abstract
 
 type PairQA struct {
-	Q string
+	Q []string
 	A string
 }
 

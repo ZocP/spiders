@@ -8,5 +8,8 @@ import (
 
 func main() {
 	log, _ := zap.NewDevelopment()
-	dynamics.GetDynamicsIDs(log, config.Config{})
+	c := config.InitConfig(log)
+	ids := dynamics.GetDynamicsIDs(log, c)
+	articles := dynamics.GetArticle(log, ids)
+
 }

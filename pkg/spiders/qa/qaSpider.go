@@ -3,7 +3,6 @@ package qa
 import (
 	"go.uber.org/zap"
 	"qa_spider/config"
-	"qa_spider/pkg/spiders/qa/dynamics"
 )
 
 type QaSpider struct {
@@ -12,8 +11,8 @@ type QaSpider struct {
 }
 
 func (q *QaSpider) Run() error {
-	dynamicIds := dynamics.GetDynamicsIDs(q.log, config.Config{})
-
+	//dynamicIds := dynamics.GetDynamicsIDs(q.log, config.Config{})
+	return nil
 }
 
 func (q *QaSpider) Update() error {
