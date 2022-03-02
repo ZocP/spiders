@@ -61,8 +61,8 @@ func GetArticle(log *zap.Logger, dIDs []string) []abstract.ArticleQA {
 	for _, val := range dIDs {
 		cv := val[:strings.Index(val, ":")]
 		title := val[strings.Index(val, ":")+1:]
-		log.Info("cv", zap.String("cv", cv))
-		log.Info("title", zap.String("title", title))
+		log.Info("getting article", zap.String("article cv", cv))
+		log.Info("getting article", zap.String("article title", title))
 		current := abstract.ArticleQA{
 			Link:  "https://www.bilibili.com/read/cv" + cv,
 			Title: title,
@@ -80,7 +80,7 @@ func GetArticle(log *zap.Logger, dIDs []string) []abstract.ArticleQA {
 		}
 		result = append(result, current)
 	}
-	return nil
+	return result
 }
 
 func filter(reader io.ReadCloser, log *zap.Logger) string {
@@ -108,15 +108,16 @@ func getQAPairs(raw string, log *zap.Logger) []abstract.PairQA {
 		if v == "" {
 			continue
 		}
-		QA := strings.Split(v, "A：")
-
+		contain := regexp.MustCompile("A.?：.*")
+		QA := contain.FindAllStringSubmatch(v, -1)
+		index := contain.FindAllStringSubmatchIndex(v, -1)
+		Q := v[:index[0][0]]
 		new := abstract.PairQA{
 			Q: make([]string, 0),
-			A: QA[1],
+			A: QA[0][0],
 		}
-		new.Q = append(new.Q, QA[0])
+		new.Q = append(new.Q, "Q: "+Q)
 		all = append(all, new)
 	}
-	log.Info("split", zap.Any("here", all))
 	return all
 }
