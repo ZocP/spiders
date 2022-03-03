@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 	"io"
 	"qa_spider/config"
-	"qa_spider/pkg/internal/spiders/qa/abstract"
+	"qa_spider/pkg/spiders/qa/abstract"
 	"regexp"
 	"strings"
 )
@@ -61,8 +61,8 @@ func GetArticle(log *zap.Logger, dIDs []string) []abstract.ArticleQA {
 	for _, val := range dIDs {
 		cv := val[:strings.Index(val, ":")]
 		title := val[strings.Index(val, ":")+1:]
-		log.Info("getting article", zap.String("article cv", cv))
-		log.Info("getting article", zap.String("article title", title))
+		log.Debug("getting article", zap.String("article cv", cv))
+		log.Debug("getting article", zap.String("article title", title))
 		current := abstract.ArticleQA{
 			Link:  "https://www.bilibili.com/read/cv" + cv,
 			Title: title,

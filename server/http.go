@@ -57,11 +57,12 @@ func InitHTTPServer(config *config.Config, logger *zap.Logger) Server {
 }
 
 func (s *HTTPServer) initContent() {
+
 }
 
 //router initialize
 func (s *HTTPServer) regHandlers() {
-	s.ctn[config.QueryQA] =
+
 }
 
 //Cors management

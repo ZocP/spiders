@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap"
 	"os"
 	"qa_spider/config"
-	"qa_spider/pkg/internal/spiders/qa/abstract"
+	"qa_spider/pkg/spiders/qa/abstract"
 )
 
 type DefaultWriter struct {
@@ -14,11 +14,11 @@ type DefaultWriter struct {
 }
 
 func (d *DefaultWriter) WriteArticleQA(articles []abstract.ArticleQA) error {
-	err := os.MkdirAll(d.config.Services.Writer.Path, 0777)
+	err := os.MkdirAll(d.config.Internal.QASpider.Writer.LocalTxt.Path, 0777)
 	if err != nil {
 		return err
 	}
-	f, err := os.Create(d.config.Services.Writer.Path + "QA.txt")
+	f, err := os.Create(d.config.Internal.QASpider.Writer.LocalTxt.Path + "QA.txt")
 	if err != nil {
 		return err
 	}
