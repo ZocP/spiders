@@ -116,7 +116,7 @@ func getQAPairs(raw string, log *zap.Logger) []abstract.PairQA {
 			Q: make([]string, 0),
 			A: QA[0][0],
 		}
-		new.Q = append(new.Q, "Q: "+Q)
+		new.Q = append(new.Q, "Q： "+Q)
 		all = append(all, new)
 	}
 	return all

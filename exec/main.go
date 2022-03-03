@@ -5,7 +5,6 @@ import (
 	"log"
 	"qa_spider/config"
 	"qa_spider/pkg/spiders/qa/abstract"
-	"qa_spider/pkg/spiders/qa/dynamics"
 	"qa_spider/pkg/spiders/qa/writer"
 	"strings"
 	"time"
@@ -15,13 +14,13 @@ func main() {
 	log, _ := zap.NewDevelopment()
 	c := config.InitConfig(log)
 	writer := writer.InitDefaultWriter(log, c)
-	ids := dynamics.GetDynamicsIDs(log, c)
-	articles := dynamics.GetArticle(log, ids)
-
-	if err := writer.WriteArticleQA(articles); err != nil {
-		log.Error("err while writing article", zap.Error(err))
-	}
-	findMatchesWithTime("嘉然", articles)
+	//ids := dynamics.GetDynamicsIDs(log, c)
+	//articles := dynamics.GetArticle(log, ids)
+	//if err := writer.WriteArticleQA(articles); err != nil {
+	//	log.Error("err while writing article", zap.Error(err))
+	//}
+	article2 := writer.ReadArticleQA("./files/spider/")
+	writer.WriteArticleQA(article2, "./files/test/")
 }
 
 func findMatchesWithTime(find string, articles []abstract.ArticleQA) {

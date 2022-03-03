@@ -5,6 +5,6 @@ import (
 )
 
 type Writer interface {
-	WriteArticleQA(articles []abstract.ArticleQA) error
+	WriteArticleQA(articles []abstract.ArticleQA, args ...interface{}) error
 	ReadArticleQA(path string) []abstract.ArticleQA
 }

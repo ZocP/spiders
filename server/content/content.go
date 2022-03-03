@@ -14,7 +14,7 @@ type Content struct {
 	Db     *gorm.DB
 }
 
-func InitContent(config *config.Config, log *zap.Logger, service int) *Content {
+func InitContent(config *config.Config, log *zap.Logger, service config.ServiceID) *Content {
 	dsn := getDSN(config, service, log)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -35,6 +35,6 @@ func getDSN(config *config.Config, service config.ServiceID, log *zap.Logger) st
 	url := DB.URL
 	dn := DB.DBName
 	r := un + ":" + pc + "@" + prtc + "(" + url + ")/" + dn
-	log.Info("service: " + strconv.Itoa(service) + " service dsn: " + r)
+	log.Info("service: " + strconv.Itoa(int(service)) + " service dsn: " + r)
 	return r
 }
