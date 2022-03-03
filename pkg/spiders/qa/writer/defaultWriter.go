@@ -3,7 +3,6 @@ package writer
 import (
 	"bufio"
 	"go.uber.org/zap"
-	"log"
 	"os"
 	"qa_spider/config"
 	"qa_spider/pkg/spiders/qa/abstract"
@@ -82,6 +81,7 @@ func (d *DefaultWriter) ReadArticleQA(path string) []abstract.ArticleQA {
 				Q := make([]string, 1)
 				A := ""
 				Q[0] = ""
+				//如果这行是Q
 				if reader.Text()[0:1] == "Q" {
 					Q[0] += reader.Text()
 					for reader.Scan() {
@@ -95,34 +95,40 @@ func (d *DefaultWriter) ReadArticleQA(path string) []abstract.ArticleQA {
 						}
 					}
 				}
-
+				//如果这行是A
 				if reader.Text()[0:1] == "A" {
 					A += reader.Text()
-					for reader.Scan() {
-						if len(reader.Text()) < 1 {
-							break
-						}
-						if reader.Text()[0:1] != "E" && reader.Text()[0:1] != "Q" {
-							A += reader.Text()
-						} else {
-							article.QA = append(article.QA, abstract.PairQA{
-								Q: Q,
-								A: A,
-							})
-							Q = make([]string, 0)
-							A = ""
-							log.Println(reader.Text())
-							break
-						}
-					}
+					article.QA = append(article.QA, abstract.PairQA{
+						Q: Q,
+						A: A,
+					})
+					Q = make([]string, 0)
+					A = ""
+					//for reader.Scan() {
+					//	if len(reader.Text()) < 1 {
+					//		break
+					//	}
+					//	if reader.Text()[0:1] != "E" && reader.Text()[0:1] != "Q" {
+					//		A += reader.Text()
+					//		break
+					//	} else {
+					//		article.QA = append(article.QA, abstract.PairQA{
+					//			Q: Q,
+					//			A: A,
+					//		})
+					//		Q = make([]string, 0)
+					//		A = ""
+					//		break
+					//	}
+					//}
 				}
-				log.Println(reader.Text())
 				if len(reader.Text()) < 1 {
 					reader.Scan()
 				}
+
+				//如果这行是结束
 				if reader.Text()[0:1] == "E" {
 					break
-
 				}
 			}
 			articles = append(articles, article)

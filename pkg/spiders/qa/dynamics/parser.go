@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func GetDynamicsIDs(log *zap.Logger, config *config.Config) []string {
+func GetDynamicsIDs(log *zap.Logger, config *config.Config) ([]string, error) {
 	pn := 1
 	ps := 30
 	var dynamics []string
@@ -27,12 +27,12 @@ func GetDynamicsIDs(log *zap.Logger, config *config.Config) []string {
 		val := gjson.Parse(body)
 		if val.Get("code").String() != "0" {
 			log.Error("parsing json", zap.String("error", val.Get("message").String()))
-			return nil
+			return nil, err
 		}
 		if val.Get("data.cards").Value() == nil {
 			log.Info("end of cards")
 			log.Info("dynamics: ", zap.Any("all", dynamics))
-			return dynamics
+			return dynamics, nil
 		}
 		val.Get("data.cards").ForEach(func(key, value gjson.Result) bool {
 			match := regexp.MustCompile(`制作委员会的每周QA\s\d+\.\d+`)
@@ -44,7 +44,6 @@ func GetDynamicsIDs(log *zap.Logger, config *config.Config) []string {
 			s := value.Get("desc.rid").String()
 
 			//避免叔叔给的过长的cv号，叔叔真是4🐎了哈哈哈
-
 			if len(s) > 12 {
 				return true
 			}

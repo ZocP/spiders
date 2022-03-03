@@ -12,6 +12,7 @@ type Content struct {
 	Log    *zap.Logger
 	Config *config.Config
 	Db     *gorm.DB
+	Data   []interface{}
 }
 
 func InitContent(config *config.Config, log *zap.Logger, service config.ServiceID) *Content {
@@ -24,6 +25,7 @@ func InitContent(config *config.Config, log *zap.Logger, service config.ServiceI
 		Config: config,
 		Db:     db,
 		Log:    log,
+		Data:   make([]interface{}, 0),
 	}
 }
 
