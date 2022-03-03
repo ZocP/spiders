@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 	"io"
 	"qa_spider/config"
-	"qa_spider/pkg/spiders/qa/abstract"
+	"qa_spider/pkg/internal/spiders/qa/abstract"
 	"regexp"
 	"strings"
 )

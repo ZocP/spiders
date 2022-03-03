@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap"
 	"os"
 	"qa_spider/config"
-	"qa_spider/pkg/spiders/qa/abstract"
+	"qa_spider/pkg/internal/spiders/qa/abstract"
 )
 
 type DefaultWriter struct {

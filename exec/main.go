@@ -3,8 +3,8 @@ package main
 import (
 	"go.uber.org/zap"
 	"qa_spider/config"
-	"qa_spider/pkg/spiders/qa/dynamics"
-	"qa_spider/pkg/spiders/qa/writer"
+	"qa_spider/pkg/internal/spiders/qa/dynamics"
+	"qa_spider/pkg/internal/spiders/qa/writer"
 )
 
 func main() {

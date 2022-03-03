@@ -10,13 +10,28 @@ import (
 
 type Config struct {
 	Server struct {
+		Port      string `json:"port"`
+		AllowCors bool   `json:"allow_cors"`
 	} `json:"server"`
-	Services struct {
+	Internal struct {
 		QASpider struct {
+			Writer struct {
+				Type     int `json:"writer_type"`
+				LocalTxt struct {
+					Path string `json:"file_path"`
+				} `json:"local_txt"`
+				LocalCSV struct {
+				} `json:"local_csv"`
+				RemoteDB struct {
+					DB DB
+				} `json:"remote_db"`
+			} `json:"writer"`
 		} `json:"qa_spider"`
-		Writer struct {
-			Path string `json:"file_path"`
-		} `json:"writer"`
+	}
+	Services struct {
+		QueryQA struct {
+			DB DB
+		} `json:"query_qa"`
 	} `json:"services"`
 }
 
@@ -92,5 +107,5 @@ func pathExists(path string) bool {
 }
 
 func setDefault(c *Config) {
-	c.Services.Writer.Path = "./files/spider/"
+	c.Internal.QASpider.Writer.LocalTxt.Path = "./files/spider/"
 }
