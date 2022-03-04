@@ -5,6 +5,7 @@ import (
 	"go.uber.org/zap"
 	"os"
 	"qa_spider/config"
+
 	"qa_spider/pkg/spiders/qa/abstract"
 	"regexp"
 )
@@ -21,7 +22,7 @@ func (d *DefaultWriter) WriteArticleQA(articles []abstract.ArticleQA, args ...in
 		if err != nil {
 			return err
 		}
-		f, err := os.Create(d.config.Internal.QASpider.Writer.LocalTxt.Path + "QA.txt")
+		f, err := os.Create(d.config.Internal.QASpider.Writer.LocalTxt.Path + QAFileName)
 		if err != nil {
 			return err
 		}
@@ -32,7 +33,7 @@ func (d *DefaultWriter) WriteArticleQA(articles []abstract.ArticleQA, args ...in
 		if err != nil {
 			return err
 		}
-		f, err := os.Create(args[0].(string) + "QA.txt")
+		f, err := os.Create(args[0].(string) + QAFileName)
 		if err != nil {
 			return err
 		}
@@ -59,7 +60,8 @@ func (d *DefaultWriter) WriteArticleQA(articles []abstract.ArticleQA, args ...in
 func (d *DefaultWriter) ReadArticleQA(path string) []abstract.ArticleQA {
 	f, err := os.Open(path + "QA.txt")
 	if err != nil {
-		d.Error("opening file", zap.Error(err))
+		d.Info("opening file", zap.Error(err))
+		return nil
 	}
 	reader := bufio.NewScanner(f)
 	title := regexp.MustCompile(`制作委员会的每周QA\s\d+\.\d+`)
@@ -104,28 +106,10 @@ func (d *DefaultWriter) ReadArticleQA(path string) []abstract.ArticleQA {
 					})
 					Q = make([]string, 0)
 					A = ""
-					//for reader.Scan() {
-					//	if len(reader.Text()) < 1 {
-					//		break
-					//	}
-					//	if reader.Text()[0:1] != "E" && reader.Text()[0:1] != "Q" {
-					//		A += reader.Text()
-					//		break
-					//	} else {
-					//		article.QA = append(article.QA, abstract.PairQA{
-					//			Q: Q,
-					//			A: A,
-					//		})
-					//		Q = make([]string, 0)
-					//		A = ""
-					//		break
-					//	}
-					//}
 				}
 				if len(reader.Text()) < 1 {
 					reader.Scan()
 				}
-
 				//如果这行是结束
 				if reader.Text()[0:1] == "E" {
 					break
@@ -135,6 +119,11 @@ func (d *DefaultWriter) ReadArticleQA(path string) []abstract.ArticleQA {
 		}
 	}
 	return articles
+}
+
+//TODO: 添加append
+func (d *DefaultWriter) AppendQA(qa abstract.ArticleQA) error {
+	return nil
 }
 
 func pairQAToString(log *zap.Logger, qa []abstract.PairQA) string {

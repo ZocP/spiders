@@ -15,7 +15,8 @@ type Config struct {
 	} `json:"server"`
 	Internal struct {
 		QASpider struct {
-			Writer struct {
+			UpdateDate string `json:"update_date"`
+			Writer     struct {
 				Type     int `json:"writer_type"`
 				LocalTxt struct {
 					Path string `json:"file_path"`

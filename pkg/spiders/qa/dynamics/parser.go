@@ -11,10 +11,61 @@ import (
 	"strings"
 )
 
-func GetDynamicsIDs(log *zap.Logger, config *config.Config) ([]string, error) {
+//arguments 里面可以塞一个终止值，如果读取到立刻停止
+func GetDynamicsIDs(log *zap.Logger, config *config.Config, args ...interface{}) ([]string, error) {
 	pn := 1
 	ps := 30
 	var dynamics []string
+	con := true
+	if args != nil && args[0] != nil {
+		log.Debug("input info with arguments")
+		for con {
+			body, err := getQADynamicAPI(pn, ps, log)
+			if err != nil {
+				log.Error("requesting QA dynamic ", zap.Error(err))
+				//TODO: add retry
+				//switch err{
+				//
+				//}
+			}
+			val := gjson.Parse(body)
+			if val.Get("code").String() != "0" {
+				log.Error("parsing json", zap.String("error", val.Get("message").String()))
+				return nil, err
+			}
+			if val.Get("data.cards").Value() == nil {
+				log.Info("end of cards")
+				log.Info("dynamics: ", zap.Any("all", dynamics))
+				return dynamics, nil
+			}
+			val.Get("data.cards").ForEach(func(key, value gjson.Result) bool {
+				match := regexp.MustCompile(`制作委员会的每周QA\s\d+\.\d+`)
+				result := match.FindAllStringSubmatch(value.Get("card").String(), -1)
+				if result == nil {
+					return true
+				}
+				log.Debug("found matches: ", zap.Any("result", result))
+				s := value.Get("desc.rid").String()
+				//避免叔叔给的过长的cv号，叔叔真是4🐎了哈哈哈
+				if s == args[0].(string) {
+					con = false
+					return false
+				}
+				if len(s) > 12 {
+					return true
+				}
+
+				dynamics = append(dynamics, s+":"+result[0][0])
+				return true
+			})
+			pn++
+		}
+	}
+	if con == false {
+		return dynamics, nil
+	}
+
+	log.Debug("input info without arguments")
 	for {
 		body, err := getQADynamicAPI(pn, ps, log)
 		if err != nil {
@@ -40,9 +91,8 @@ func GetDynamicsIDs(log *zap.Logger, config *config.Config) ([]string, error) {
 			if result == nil {
 				return true
 			}
-			log.Info("found matches: ", zap.Any("result", result))
+			log.Debug("found matches: ", zap.Any("result", result))
 			s := value.Get("desc.rid").String()
-
 			//避免叔叔给的过长的cv号，叔叔真是4🐎了哈哈哈
 			if len(s) > 12 {
 				return true
