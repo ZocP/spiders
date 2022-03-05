@@ -31,6 +31,11 @@ func (l *Listener) Run() {
 					if err := l.spider.Reload(); err != nil {
 						l.Info("reloading", zap.Error(err))
 					}
+				case "inspect_all_titles":
+					qa := l.spider.GetAllQA()
+					for _, v := range qa {
+						l.Info("inspecting", zap.String("title", v.Title))
+					}
 				default:
 					l.Info("didn't find this method")
 				}

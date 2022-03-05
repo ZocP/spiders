@@ -15,7 +15,7 @@ type DefaultWriter struct {
 	config *config.Config
 }
 
-func (d *DefaultWriter) WriteArticleQA(articles []abstract.ArticleQA, args ...interface{}) error {
+func (d *DefaultWriter) WriteArticleQA(articles []*abstract.ArticleQA, args ...interface{}) error {
 	var file *os.File
 	if args == nil {
 		err := os.MkdirAll(d.config.Internal.QASpider.Writer.LocalTxt.Path, 0777)
@@ -58,7 +58,7 @@ func (d *DefaultWriter) WriteArticleQA(articles []abstract.ArticleQA, args ...in
 	return nil
 }
 
-func (d *DefaultWriter) ReadArticleQA(path string) []abstract.ArticleQA {
+func (d *DefaultWriter) ReadArticleQA(path string) []*abstract.ArticleQA {
 	f, err := os.Open(path + "QA.txt")
 	if err != nil {
 		d.Info("opening file", zap.Error(err))
@@ -66,12 +66,14 @@ func (d *DefaultWriter) ReadArticleQA(path string) []abstract.ArticleQA {
 	}
 	reader := bufio.NewScanner(f)
 	title := regexp.MustCompile(`制作委员会的每周QA\s\d+\.\d+`)
-	articles := make([]abstract.ArticleQA, 0)
+	cv := regexp.MustCompile("[0-9].*")
+	articles := make([]*abstract.ArticleQA, 0)
 	for reader.Scan() {
 		if title.FindAllStringSubmatchIndex(reader.Text(), -1) != nil {
 			stitle := reader.Text()
 			reader.Scan()
-			article := abstract.ArticleQA{
+			article := &abstract.ArticleQA{
+				CV:    cv.FindStringSubmatch(reader.Text())[0],
 				Link:  reader.Text(),
 				Title: stitle,
 				QA:    make([]abstract.PairQA, 0),
@@ -81,18 +83,17 @@ func (d *DefaultWriter) ReadArticleQA(path string) []abstract.ArticleQA {
 				if len(reader.Text()) < 2 {
 					break
 				}
-				Q := make([]string, 1)
+				Q := ""
 				A := ""
-				Q[0] = ""
 				//如果这行是Q
 				if reader.Text()[0:1] == "Q" {
-					Q[0] += reader.Text()
+					Q += reader.Text()
 					for reader.Scan() {
 						if len(reader.Text()) < 1 {
 							break
 						}
 						if reader.Text()[0:1] != "E" && reader.Text()[0:1] != "A" {
-							Q[0] += reader.Text()
+							Q += reader.Text()
 						} else {
 							break
 						}
@@ -105,7 +106,7 @@ func (d *DefaultWriter) ReadArticleQA(path string) []abstract.ArticleQA {
 						Q: Q,
 						A: A,
 					})
-					Q = make([]string, 0)
+					Q = ""
 					A = ""
 				}
 				if len(reader.Text()) < 1 {
@@ -130,9 +131,8 @@ func (d *DefaultWriter) AppendQA(qa abstract.ArticleQA) error {
 func pairQAToString(log *zap.Logger, qa []abstract.PairQA) string {
 	result := ""
 	for _, pair := range qa {
-		for _, v := range pair.Q {
-			result += v + "\n"
-		}
+
+		result += pair.Q + "\n"
 		result += pair.A + "\n"
 	}
 	return result

@@ -55,13 +55,13 @@ func readFromFiles(log *zap.Logger) (*Config, bool) {
 			log.Error("making path: ", zap.Error(err))
 		}
 	}
-	if !pathExists(path + "config.json") {
-		makeBlankConfig(path+"config.json", log)
+	if !pathExists(path + "cfg.json") {
+		makeBlankConfig(path+"cfg.json", log)
 		log.Info("config file not found, generated new file, please fill in the config.")
 		os.Exit(1)
 		return nil, false
 	}
-	f, err := os.Open(path + "config.json")
+	f, err := os.Open(path + "cfg.json")
 	defer f.Close()
 	if err != nil {
 

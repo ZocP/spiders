@@ -105,14 +105,15 @@ func GetDynamicsIDs(log *zap.Logger, config *config.Config, args ...interface{})
 	}
 }
 
-func GetArticle(log *zap.Logger, dIDs []string) []abstract.ArticleQA {
-	var result []abstract.ArticleQA
+func GetArticle(log *zap.Logger, dIDs []string) []*abstract.ArticleQA {
+	var result []*abstract.ArticleQA
 	for _, val := range dIDs {
 		cv := val[:strings.Index(val, ":")]
 		title := val[strings.Index(val, ":")+1:]
 		log.Debug("getting article", zap.String("article cv", cv))
 		log.Debug("getting article", zap.String("article title", title))
 		current := abstract.ArticleQA{
+			CV:    cv,
 			Link:  "https://www.bilibili.com/read/cv" + cv,
 			Title: title,
 			QA:    make([]abstract.PairQA, 0),
@@ -127,7 +128,7 @@ func GetArticle(log *zap.Logger, dIDs []string) []abstract.ArticleQA {
 		} else {
 			current.QA = get
 		}
-		result = append(result, current)
+		result = append(result, &current)
 	}
 	return result
 }
@@ -162,10 +163,10 @@ func getQAPairs(raw string, log *zap.Logger) []abstract.PairQA {
 		index := contain.FindAllStringSubmatchIndex(v, -1)
 		Q := v[:index[0][0]]
 		new := abstract.PairQA{
-			Q: make([]string, 0),
+			Q: "",
 			A: QA[0][0],
 		}
-		new.Q = append(new.Q, "Q： "+Q)
+		new.Q = "Q： " + Q
 		all = append(all, new)
 	}
 	return all

@@ -1,35 +1,81 @@
 package queryQA
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"log"
-	"qa_spider/pkg/spiders/qa/abstract"
+	"go.uber.org/zap"
+	"net/http"
+	"net/url"
+	"qa_spider/pkg/services"
+	"qa_spider/pkg/spiders/qa"
 	"qa_spider/server/content"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
-func QueryQA(ctx content.Content) gin.HandlerFunc {
-	panic("implement me")
+func QueryQA(ctn *content.Content) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		kw := ctx.Query("key")
+		kw, err := url.QueryUnescape(kw)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, services.ErrorResponse(err))
+		}
+		ctn.Debug("request key", zap.String("key", kw))
+		ctn.Debug("request key", zap.Int("len", len(kw)))
+		length := utf8.RuneCountInString(kw)
+		if length < 3 || length > 20 {
+			ctx.JSON(http.StatusBadRequest, services.ErrorResponse(fmt.Errorf("too short or too long keyword")))
+			return
+		}
+
+		result := findMatchesWithTime(kw, ctn)
+		ctn.Debug("matches found", zap.Int("result found", len(result)))
+		if result == nil || len(result) == 0 {
+			ctx.JSON(http.StatusOK, services.ErrorResponse(fmt.Errorf("no match QA found")))
+			return
+		}
+		if len(result) > 30 {
+			ctx.JSON(http.StatusOK, services.ErrorResponse(fmt.Errorf("too many results, use a longer keyword")))
+			return
+		}
+
+		ctx.JSON(http.StatusOK, services.SuccessResponse(result))
+	}
 }
 
-func findMatchesWithTime(find string, articles []abstract.ArticleQA) {
+func findMatchesWithTime(find string, ctn *content.Content) []Result {
+	var r []Result
 	begin := time.Now()
+	articles := ctn.Data[0].(qa.Spider).GetAllQA()
 	for _, v := range articles {
-		if strings.Index(v.Title, find) > 0 {
-			log.Println("found at" + v.Title)
+		result := Result{
+			Title: v.Title,
+			Link:  v.Link,
+			QA:    make([]PairQA, 0),
 		}
 		for _, v2 := range v.QA {
-			for _, v3 := range v2.Q {
-				if strings.Index(v3, find) > 0 {
-					log.Println("found at: " + v3)
-				}
+			if strings.Index(v2.Q, find) > 0 {
+				result.QA = append(result.QA, PairQA{
+					Q: v2.Q,
+					A: v2.A,
+				})
+				continue
 			}
 			if strings.Index(v2.A, find) > 0 {
-				log.Println("found at: ", v2.A)
+				result.QA = append(result.QA, PairQA{
+					Q: v2.Q,
+					A: v2.A,
+				})
+				continue
 			}
 		}
+		if len(result.QA) == 0 {
+			continue
+		}
+		r = append(r, result)
 	}
 	end := time.Now()
-	log.Println("time used:", end.UnixMilli()-begin.UnixMilli())
+	ctn.Debug("time used:", zap.Int64("in milliseconds", end.UnixMilli()-begin.UnixMilli()))
+	return r
 }

@@ -9,6 +9,6 @@ type Spider interface {
 	pkg.Internal
 	Run() error
 	Update() error
-	GetAllQA() []abstract.ArticleQA
+	GetAllQA() []*abstract.ArticleQA
 	Reload() error
 }

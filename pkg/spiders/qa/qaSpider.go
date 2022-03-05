@@ -9,6 +9,7 @@ import (
 	"qa_spider/pkg/spiders/qa/dynamics"
 	"qa_spider/pkg/spiders/qa/writer"
 	"regexp"
+	"sync"
 )
 
 const (
@@ -18,10 +19,19 @@ const (
 type QaSpider struct {
 	IName   string
 	writer  writer.Writer
-	storage []abstract.ArticleQA
+	storage []*abstract.ArticleQA
 	config  *config.Config
 	log     *zap.Logger
 	cron    *cron.Cron
+	lock    *sync.Mutex
+}
+
+func (q *QaSpider) Lock() {
+	q.lock.Lock()
+}
+
+func (q *QaSpider) Unlock() {
+	q.lock.Unlock()
 }
 
 func (q *QaSpider) GetName() string {
@@ -35,7 +45,14 @@ func (q *QaSpider) Run() error {
 		if f := q.writer.ReadArticleQA(q.config.Internal.QASpider.Writer.LocalTxt.Path); f != nil {
 			q.log.Info("loaded from local storage")
 			q.storage = f
+			if q.config.Internal.QASpider.AutoUpdate {
+				err := q.timeUpdater("2")
+				if err != nil {
+					return err
+				}
+			}
 			return nil
+
 		}
 		q.log.Info("file not exist, generating new QA")
 		ids, err := dynamics.GetDynamicsIDs(q.log, q.config)
@@ -57,6 +74,8 @@ func (q *QaSpider) Run() error {
 }
 
 func (q *QaSpider) Update() error {
+	q.Lock()
+	defer q.Unlock()
 	q.log.Info("spider updating")
 	cv := regexp.MustCompile("[0-9].*")
 	if len(q.storage) == 0 {
@@ -85,11 +104,13 @@ func (q *QaSpider) Update() error {
 	return nil
 }
 
-func (q *QaSpider) GetAllQA() []abstract.ArticleQA {
+func (q *QaSpider) GetAllQA() []*abstract.ArticleQA {
 	return q.storage
 }
 
 func (q *QaSpider) Reload() error {
+	q.Lock()
+	defer q.Unlock()
 	if f := q.writer.ReadArticleQA(q.config.Internal.QASpider.Writer.LocalTxt.Path); f != nil {
 		q.log.Info("reload from file", zap.Int("total articles", len(f)))
 		q.storage = f
@@ -100,9 +121,10 @@ func (q *QaSpider) Reload() error {
 func InitDefaultSpider(writer writer.Writer, config *config.Config, log *zap.Logger) Spider {
 	return &QaSpider{
 		writer:  writer,
-		storage: make([]abstract.ArticleQA, 0),
+		storage: make([]*abstract.ArticleQA, 0),
 		config:  config,
 		log:     log,
+		lock:    &sync.Mutex{},
 	}
 }
 
@@ -113,12 +135,13 @@ func (q *QaSpider) timeUpdater(date string) error {
 	}
 	c := cron.New()
 	q.cron = c
-	if err := c.AddFunc("0 0 0 0 0 WED", func() {
+	if err := c.AddFunc(fmt.Sprintf("0 0 0 * * %s", q.config.Internal.QASpider.UpdateDate), func() {
 		if err := q.Update(); err != nil {
-			q.log.Info("error ")
+			q.log.Info("error", zap.Error(err))
 		}
 	}); err != nil {
 		q.log.Error("adding func", zap.Error(err))
 	}
+	c.Run()
 	return nil
 }

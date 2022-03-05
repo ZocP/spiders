@@ -2,31 +2,29 @@ package content
 
 import (
 	"go.uber.org/zap"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 	"qa_spider/config"
 	"strconv"
 )
 
 type Content struct {
-	Log    *zap.Logger
+	*zap.Logger
 	Config *config.Config
-	Db     *gorm.DB
 	Data   []interface{}
 }
 
-func InitContent(config *config.Config, log *zap.Logger, service config.ServiceID) *Content {
-	dsn := getDSN(config, service, log)
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		log.Error("connecting to database: ", zap.Error(err))
-	}
-	return &Content{
+func InitContent(config *config.Config, log *zap.Logger, data ...interface{}) *Content {
+	//dsn := getDSN(config, log)
+	//db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	//if err != nil {
+	//	log.Error("connecting to database: ", zap.Error(err))
+	//}
+	r := &Content{
 		Config: config,
-		Db:     db,
-		Log:    log,
+		Logger: log,
 		Data:   make([]interface{}, 0),
 	}
+	r.Data = data
+	return r
 }
 
 func getDSN(config *config.Config, service config.ServiceID, log *zap.Logger) string {

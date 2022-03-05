@@ -7,6 +7,7 @@ import (
 	"os"
 	"qa_spider/config"
 	"qa_spider/pkg"
+	"qa_spider/pkg/services/queryQA"
 	"qa_spider/server/content"
 )
 
@@ -48,11 +49,10 @@ func InitHTTPServer(config *config.Config, logger *zap.Logger, internal ...pkg.I
 		internal: make(map[string]pkg.Internal),
 	}
 	//init content services
-	s.initContent()
 
 	s.regInternal(internal...)
 	//init internal dependencies
-
+	s.initContent()
 	//init handlers
 	s.regHandlers()
 
@@ -67,12 +67,13 @@ func InitHTTPServer(config *config.Config, logger *zap.Logger, internal ...pkg.I
 }
 
 func (s *HTTPServer) initContent() {
+	s.ctn["qa_spider"] = content.InitContent(s.config, s.log, s.internal["QASPIDER"])
 
 }
 
 //router initialize
 func (s *HTTPServer) regHandlers() {
-
+	s.engine.GET("v1/spider/find", queryQA.QueryQA(s.ctn["qa_spider"]))
 }
 
 //initial internal dependencies
