@@ -37,7 +37,7 @@ func (l *Listener) Run() {
 						l.Info("inspecting", zap.String("title", v.Title))
 					}
 				default:
-					l.Info("didn't find this method")
+					l.Info("didn't find this method, available functions: update; reload; inspect_all_titles")
 				}
 			case "server":
 				switch function {

@@ -3,7 +3,6 @@ package content
 import (
 	"go.uber.org/zap"
 	"qa_spider/config"
-	"strconv"
 )
 
 type Content struct {
@@ -27,14 +26,14 @@ func InitContent(config *config.Config, log *zap.Logger, data ...interface{}) *C
 	return r
 }
 
-func getDSN(config *config.Config, service config.ServiceID, log *zap.Logger) string {
-	DB := config.GetServiceDB(service)
-	un := DB.UserName
-	pc := DB.Password
-	prtc := DB.Protocol
-	url := DB.URL
-	dn := DB.DBName
-	r := un + ":" + pc + "@" + prtc + "(" + url + ")/" + dn
-	log.Info("service: " + strconv.Itoa(int(service)) + " service dsn: " + r)
-	return r
-}
+//func getDSN(config *config.Config, service config.ServiceID, log *zap.Logger) string {
+//	DB := config.GetServiceDB(service)
+//	un := DB.UserName
+//	pc := DB.Password
+//	prtc := DB.Protocol
+//	url := DB.URL
+//	dn := DB.DBName
+//	r := un + ":" + pc + "@" + prtc + "(" + url + ")/" + dn
+//	log.Info("service: " + strconv.Itoa(int(service)) + " service dsn: " + r)
+//	return r
+//}

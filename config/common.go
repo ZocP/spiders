@@ -23,11 +23,11 @@ type DB struct {
 	DBName   string `json:"db_name"`
 }
 
-func (c *Config) GetServiceDB(service ServiceID) DB {
-	switch service {
-	case QueryQA:
-		return c.Services.QueryQA.DB
-		// can add more services here to get DB
-	}
-	return DB{}
-}
+//func (c *Config) GetServiceDB(service ServiceID) DB {
+//	switch service {
+//	case QueryQA:
+//		return c.Services.QueryQA.DB
+//		// can add more services here to get DB
+//	}
+//	return DB{}
+//}

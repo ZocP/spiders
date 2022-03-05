@@ -25,14 +25,16 @@ type Config struct {
 				LocalCSV struct {
 				} `json:"local_csv"`
 				RemoteDB struct {
-					DB DB `json:"db,omitempty"`
+					//	DB DB `json:"db,omitempty"`
 				} `json:"remote_db"`
 			} `json:"writer"`
 		} `json:"qa_spider"`
 	}
 	Services struct {
 		QueryQA struct {
-			DB DB `json:"db,omitempty"`
+			Longest  int `json:"longest"`
+			Shortest int `json:"shortest"`
+			//DB DB `json:"db,omitempty"`
 		} `json:"query_qa"`
 	} `json:"services"`
 }
@@ -110,4 +112,9 @@ func pathExists(path string) bool {
 func setDefault(c *Config) {
 	c.Internal.QASpider.Writer.LocalTxt.Path = "./files/spider/"
 	c.Server.Port = ":8080"
+	c.Internal.QASpider.AutoUpdate = true
+	c.Internal.QASpider.Writer.Type = 0
+	c.Internal.QASpider.UpdateDate = "WED"
+	c.Services.QueryQA.Shortest = 3
+	c.Services.QueryQA.Longest = 20
 }
