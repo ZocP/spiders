@@ -11,7 +11,12 @@ import (
 	"regexp"
 )
 
+const (
+	INAME = "QASPIDER"
+)
+
 type QaSpider struct {
+	IName   string
 	writer  writer.Writer
 	storage []abstract.ArticleQA
 	config  *config.Config
@@ -19,10 +24,16 @@ type QaSpider struct {
 	cron    *cron.Cron
 }
 
+func (q *QaSpider) GetName() string {
+	return INAME
+}
+
 func (q *QaSpider) Run() error {
+	q.log.Info("QA spider running，羊驼k48")
 	if q.config.Internal.QASpider.Writer.Type == config.LocalTxt {
 		//f, err := os.Open(q.config.Internal.QASpider.Writer.LocalTxt.Path + QAFileName)
 		if f := q.writer.ReadArticleQA(q.config.Internal.QASpider.Writer.LocalTxt.Path); f != nil {
+			q.log.Info("loaded from local storage")
 			q.storage = f
 			return nil
 		}
@@ -36,14 +47,17 @@ func (q *QaSpider) Run() error {
 			q.log.Error("Error writing QA", zap.Error(err))
 		}
 	}
-	err := q.timeUpdater("2")
-	if err != nil {
-		return err
+	if q.config.Internal.QASpider.AutoUpdate {
+		err := q.timeUpdater("2")
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
 func (q *QaSpider) Update() error {
+	q.log.Info("spider updating")
 	cv := regexp.MustCompile("[0-9].*")
 	if len(q.storage) == 0 {
 		ids, err := dynamics.GetDynamicsIDs(q.log, q.config)
@@ -65,6 +79,9 @@ func (q *QaSpider) Update() error {
 		return fmt.Errorf("nothing can be updated")
 	}
 	q.storage = append(appender, q.storage...)
+	if err := q.writer.WriteArticleQA(q.storage); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -72,6 +89,14 @@ func (q *QaSpider) GetAllQA() []abstract.ArticleQA {
 	return q.storage
 }
 
+func (q *QaSpider) Reload() error {
+	if f := q.writer.ReadArticleQA(q.config.Internal.QASpider.Writer.LocalTxt.Path); f != nil {
+		q.log.Info("reload from file", zap.Int("total articles", len(f)))
+		q.storage = f
+		return nil
+	}
+	return fmt.Errorf("unable to reload")
+}
 func InitDefaultSpider(writer writer.Writer, config *config.Config, log *zap.Logger) Spider {
 	return &QaSpider{
 		writer:  writer,

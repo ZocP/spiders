@@ -4,42 +4,53 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"net/http"
+	"os"
 	"qa_spider/config"
+	"qa_spider/pkg"
 	"qa_spider/server/content"
 )
 
 type HTTPServer struct {
-	config *config.Config
-	log    *zap.Logger
-	engine *gin.Engine
-	ctn    map[interface{}]*content.Content
+	config   *config.Config
+	log      *zap.Logger
+	engine   *gin.Engine
+	ctn      map[interface{}]*content.Content
+	internal map[string]pkg.Internal
 }
 
 func (s *HTTPServer) Run() error {
+	for _, v := range s.internal {
+		go func() {
+			if err := v.Run(); err != nil {
+				s.log.Error("initializing internal services", zap.String("service name", v.GetName()))
+			}
+		}()
+	}
 	if err := s.engine.Run(s.config.Server.Port); err != nil {
 		return err
 	}
-
 	return nil
 }
 
 func (s *HTTPServer) Stop() {
-	s.log.Sync()
+	os.Exit(1)
 }
 
-func InitHTTPServer(config *config.Config, logger *zap.Logger) Server {
+func InitHTTPServer(config *config.Config, logger *zap.Logger, internal ...pkg.Internal) Server {
+	//set mode
+	gin.SetMode(gin.DebugMode)
+
 	s := &HTTPServer{
-		config: config,
-		log:    logger,
-		engine: gin.Default(),
-		ctn:    make(map[interface{}]*content.Content),
+		config:   config,
+		log:      logger,
+		engine:   gin.Default(),
+		ctn:      make(map[interface{}]*content.Content),
+		internal: make(map[string]pkg.Internal),
 	}
 	//init content services
 	s.initContent()
 
-	//set mode
-	gin.SetMode(gin.DebugMode)
-
+	s.regInternal(internal...)
 	//init internal dependencies
 
 	//init handlers
@@ -52,7 +63,6 @@ func InitHTTPServer(config *config.Config, logger *zap.Logger) Server {
 	} else {
 		logger.Info("Server allow cors disabled")
 	}
-
 	return s
 }
 
@@ -63,6 +73,13 @@ func (s *HTTPServer) initContent() {
 //router initialize
 func (s *HTTPServer) regHandlers() {
 
+}
+
+//initial internal dependencies
+func (s *HTTPServer) regInternal(internals ...pkg.Internal) {
+	for _, v := range internals {
+		s.internal[v.GetName()] = v
+	}
 }
 
 //Cors management

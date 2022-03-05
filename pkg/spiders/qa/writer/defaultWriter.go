@@ -44,7 +44,7 @@ func (d *DefaultWriter) WriteArticleQA(articles []abstract.ArticleQA, args ...in
 	defer w.Flush()
 
 	for _, v := range articles {
-		d.Info("writing article", zap.String("article", v.Title))
+		d.Debug("writing article", zap.String("article", v.Title))
 		_, err := w.WriteString(
 			v.Title + "\n" +
 				v.Link + "\n" +
@@ -54,6 +54,7 @@ func (d *DefaultWriter) WriteArticleQA(articles []abstract.ArticleQA, args ...in
 			d.Error("err while writing", zap.Error(err))
 		}
 	}
+	d.Info("finished writing articles", zap.String("path", d.config.Internal.QASpider.Writer.LocalTxt.Path))
 	return nil
 }
 

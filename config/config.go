@@ -15,6 +15,7 @@ type Config struct {
 	} `json:"server"`
 	Internal struct {
 		QASpider struct {
+			AutoUpdate bool   `json:"auto_update"`
 			UpdateDate string `json:"update_date"`
 			Writer     struct {
 				Type     int `json:"writer_type"`
@@ -24,14 +25,14 @@ type Config struct {
 				LocalCSV struct {
 				} `json:"local_csv"`
 				RemoteDB struct {
-					DB DB
+					DB DB `json:"db,omitempty"`
 				} `json:"remote_db"`
 			} `json:"writer"`
 		} `json:"qa_spider"`
 	}
 	Services struct {
 		QueryQA struct {
-			DB DB
+			DB DB `json:"db,omitempty"`
 		} `json:"query_qa"`
 	} `json:"services"`
 }
@@ -56,8 +57,7 @@ func readFromFiles(log *zap.Logger) (*Config, bool) {
 	}
 	if !pathExists(path + "config.json") {
 		makeBlankConfig(path+"config.json", log)
-		log.Info("made blank config")
-		log.Info("generated new file, please fill in the config.")
+		log.Info("config file not found, generated new file, please fill in the config.")
 		os.Exit(1)
 		return nil, false
 	}
@@ -109,4 +109,5 @@ func pathExists(path string) bool {
 
 func setDefault(c *Config) {
 	c.Internal.QASpider.Writer.LocalTxt.Path = "./files/spider/"
+	c.Server.Port = ":8080"
 }
