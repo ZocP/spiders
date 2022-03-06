@@ -4,14 +4,18 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"os"
+	"qa_spider/config"
 	"qa_spider/pkg/spiders/qa"
+	"qa_spider/pkg/spiders/qa/writer"
 	"qa_spider/server"
 )
 
 type Listener struct {
 	*zap.Logger
+	config *config.Config
 	spider qa.Spider
 	server server.Server
+	writer writer.Writer
 }
 
 func (l *Listener) Run() {
@@ -36,6 +40,8 @@ func (l *Listener) Run() {
 					for _, v := range qa {
 						l.Info("inspecting", zap.String("title", v.Title))
 					}
+				case "write_test_file":
+					l.spider.GetAllQA()
 				default:
 					l.Info("didn't find this method, available functions: update; reload; inspect_all_titles")
 				}

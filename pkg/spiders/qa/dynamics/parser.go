@@ -145,6 +145,8 @@ func filter(reader io.ReadCloser, log *zap.Logger) string {
 }
 
 func getQAPairs(raw string, log *zap.Logger) []abstract.PairQA {
+	about := regexp.MustCompile("[^\u4e00-\uFFFFF\\w\uFF00-\uFFFF]{1,5}关于【?.{0,7}】?[^\u4ef00-\uFFFF\\w\uFF00-\uFFFF]{1,5}")
+	raw = about.ReplaceAllString(raw, "")
 	var all []abstract.PairQA
 	if raw == "" {
 		log.Info("empty article")
@@ -160,13 +162,16 @@ func getQAPairs(raw string, log *zap.Logger) []abstract.PairQA {
 		}
 		contain := regexp.MustCompile("A.?：.*")
 		QA := contain.FindAllStringSubmatch(v, -1)
+
 		index := contain.FindAllStringSubmatchIndex(v, -1)
 		Q := v[:index[0][0]]
 		new := abstract.PairQA{
 			Q: "",
 			A: QA[0][0],
 		}
-		new.Q = "Q： " + Q
+		new.Q = "Q：" + strings.Replace(Q, "\n", "", -1)
+		new.Q = strings.Replace(new.Q, " ", "", -1)
+		new.A = strings.Replace(new.A, " ", "", -1)
 		all = append(all, new)
 	}
 	return all
