@@ -1,6 +1,7 @@
 package server
 
 import (
+	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"qa_spider/pkg"
 	"qa_spider/pkg/services/queryQA"
 	"qa_spider/server/content"
+	"time"
 )
 
 type HTTPServer struct {
@@ -44,11 +46,14 @@ func InitHTTPServer(config *config.Config, logger *zap.Logger, internal ...pkg.I
 	s := &HTTPServer{
 		config:   config,
 		log:      logger,
-		engine:   gin.Default(),
+		engine:   gin.New(),
 		ctn:      make(map[interface{}]*content.Content),
 		internal: make(map[string]pkg.Internal),
 	}
 	//init content services
+
+	//use zap as logger
+	s.engine.Use(ginzap.Ginzap(s.log, time.RFC3339, true))
 
 	if config.Server.AllowCors {
 		logger.Info("Server allow cors enabled")

@@ -5,9 +5,9 @@ import (
 	"github.com/robfig/cron"
 	"go.uber.org/zap"
 	"qa_spider/config"
-	"qa_spider/pkg/spiders/qa/abstract"
-	"qa_spider/pkg/spiders/qa/dynamics"
-	"qa_spider/pkg/spiders/qa/writer"
+	"qa_spider/pkg/internalsvc/spiders/qa/abstract"
+	"qa_spider/pkg/internalsvc/spiders/qa/dynamics"
+	"qa_spider/pkg/internalsvc/spiders/qa/writer"
 	"regexp"
 	"sync"
 )

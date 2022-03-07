@@ -1,7 +1,7 @@
 package writer
 
 import (
-	"qa_spider/pkg/spiders/qa/abstract"
+	"qa_spider/pkg/internalsvc/spiders/qa/abstract"
 )
 
 type Writer interface {

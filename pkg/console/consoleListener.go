@@ -5,8 +5,8 @@ import (
 	"go.uber.org/zap"
 	"os"
 	"qa_spider/config"
-	"qa_spider/pkg/spiders/qa"
-	"qa_spider/pkg/spiders/qa/writer"
+	"qa_spider/pkg/internalsvc/spiders/qa"
+	"qa_spider/pkg/internalsvc/spiders/qa/writer"
 	"qa_spider/server"
 )
 
