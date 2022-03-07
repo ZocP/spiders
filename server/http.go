@@ -23,6 +23,7 @@ type HTTPServer struct {
 
 func (s *HTTPServer) Run() error {
 	for _, v := range s.internal {
+		v := v
 		go func() {
 			if err := v.Run(); err != nil {
 				s.log.Error("initializing internal services", zap.String("service name", v.GetName()))
