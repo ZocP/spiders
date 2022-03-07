@@ -112,9 +112,11 @@ func pathExists(path string) bool {
 func setDefault(c *Config) {
 	c.Internal.QASpider.Writer.LocalTxt.Path = "./files/spider/"
 	c.Server.Port = ":8080"
+	c.Server.AllowCors = true
 	c.Internal.QASpider.AutoUpdate = true
 	c.Internal.QASpider.Writer.Type = 0
 	c.Internal.QASpider.UpdateDate = "WED"
 	c.Services.QueryQA.Shortest = 3
 	c.Services.QueryQA.Longest = 20
+
 }
