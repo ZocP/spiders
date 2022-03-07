@@ -8,9 +8,11 @@ require (
 	github.com/robfig/cron v1.2.0
 	github.com/tidwall/gjson v1.14.0
 	go.uber.org/zap v1.21.0
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
 
 require (
+	github.com/BurntSushi/toml v1.0.0 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.13.0 // indirect

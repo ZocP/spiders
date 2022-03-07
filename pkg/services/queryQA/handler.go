@@ -35,7 +35,7 @@ func QueryQA(ctn *content.Content) gin.HandlerFunc {
 			ctx.JSON(http.StatusOK, services.ErrorResponse(fmt.Errorf("no match QA found")))
 			return
 		}
-		if len(result) > 30 {
+		if ctn.Config.Services.QueryQA.MaxArticleResults > 0 && len(result) > ctn.Config.Services.QueryQA.MaxArticleResults {
 			ctx.JSON(http.StatusOK, services.ErrorResponse(fmt.Errorf("too many results, use a longer keyword")))
 			return
 		}
