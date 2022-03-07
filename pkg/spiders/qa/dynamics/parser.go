@@ -145,8 +145,12 @@ func filter(reader io.ReadCloser, log *zap.Logger) string {
 }
 
 func getQAPairs(raw string, log *zap.Logger) []abstract.PairQA {
+
 	about := regexp.MustCompile("[^\u4e00-\uFFFFF\\w\uFF00-\uFFFF]{1,5}关于【?.{0,7}】?[^\u4ef00-\uFFFF\\w\uFF00-\uFFFF]{1,5}")
 	raw = about.ReplaceAllString(raw, "")
+	end := regexp.MustCompile("感谢小伙伴们的耐心阅读同时.*|以上就是本期QA的全部内容.*")
+	//end2 := regexp.MustCompile("以上就是本期QA的全部内容.*")
+	raw = end.ReplaceAllString(raw, "")
 	var all []abstract.PairQA
 	if raw == "" {
 		log.Info("empty article")

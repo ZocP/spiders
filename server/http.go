@@ -50,6 +50,13 @@ func InitHTTPServer(config *config.Config, logger *zap.Logger, internal ...pkg.I
 	}
 	//init content services
 
+	if config.Server.AllowCors {
+		logger.Info("Server allow cors enabled")
+		s.engine.Use(Cors())
+	} else {
+		logger.Info("Server allow cors disabled")
+	}
+
 	s.regInternal(internal...)
 	//init internal dependencies
 	s.initContent()
@@ -57,12 +64,7 @@ func InitHTTPServer(config *config.Config, logger *zap.Logger, internal ...pkg.I
 	s.regHandlers()
 
 	//allow cors
-	if config.Server.AllowCors {
-		logger.Info("Server allow cors enabled")
-		s.engine.Use(Cors())
-	} else {
-		logger.Info("Server allow cors disabled")
-	}
+
 	return s
 }
 

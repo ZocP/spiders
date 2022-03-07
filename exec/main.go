@@ -14,7 +14,6 @@ func main() {
 	if err := InitDependencies().Run(); err != nil {
 		log.Fatal("fatal while starting")
 	}
-
 }
 
 func InitDependencies() server.Server {
