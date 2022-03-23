@@ -29,6 +29,10 @@ func QueryQA(ctn *content.Content) gin.HandlerFunc {
 			return
 		}
 
+		if kw == "小伙伴你好" {
+			ctx.JSON(http.StatusOK, services.SuccessResponse("YBB"))
+			return
+		}
 		result := findMatchesWithTime(kw, ctn)
 		ctn.Debug("matches found", zap.Int("result found", len(result)))
 		if result == nil || len(result) == 0 {
