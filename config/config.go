@@ -41,7 +41,7 @@ type Config struct {
 }
 
 func InitConfig(log *zap.Logger) *Config {
-	config, ok := readFromFiles(log)
+	config, ok := ReadFromFiles(log)
 	log.Info("config initializing")
 	if !ok {
 		log.Fatal("invalid config")
@@ -49,10 +49,10 @@ func InitConfig(log *zap.Logger) *Config {
 	return config
 }
 
-func readFromFiles(log *zap.Logger) (*Config, bool) {
+func ReadFromFiles(log *zap.Logger) (*Config, bool) {
 	config := &Config{}
 	path := "./files/"
-	log.Info("file path: " + path)
+	log.Info("reading cfg from file path: " + path)
 	if !pathExists(path) {
 		if err := os.MkdirAll(path, 0777); err != nil {
 			log.Error("making path: ", zap.Error(err))

@@ -16,7 +16,7 @@ type DefaultTagger struct {
 }
 
 func (d *DefaultTagger) Run() error {
-
+	return nil
 }
 
 func (d *DefaultTagger) GetName() string {
@@ -32,4 +32,5 @@ func (d *DefaultTagger) GetTagWithQAs(tag string) ([]abstract.ArticleQA, error) 
 }
 
 func InitDefaultTagger() tagger.Tagger {
+	return nil
 }

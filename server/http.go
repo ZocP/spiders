@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -10,15 +11,25 @@ import (
 	"qa_spider/pkg"
 	"qa_spider/pkg/services/queryQA"
 	"qa_spider/server/content"
+	"sync"
 	"time"
 )
 
 type HTTPServer struct {
+	lock     *sync.Mutex
 	config   *config.Config
 	log      *zap.Logger
 	engine   *gin.Engine
 	ctn      map[interface{}]*content.Content
 	internal map[string]pkg.Internal
+}
+
+func (s *HTTPServer) Lock() {
+	s.lock.Lock()
+}
+
+func (s *HTTPServer) Unlock() {
+	s.lock.Unlock()
 }
 
 func (s *HTTPServer) Run() error {
@@ -40,12 +51,23 @@ func (s *HTTPServer) Stop() {
 	os.Exit(1)
 }
 
+func (s *HTTPServer) ReloadConfig(config *config.Config) error {
+	s.Lock()
+	defer s.Unlock()
+	if config == nil {
+		return fmt.Errorf("config is nil")
+	}
+	s.config = config
+	return nil
+}
+
 func InitHTTPServer(config *config.Config, logger *zap.Logger, internal ...pkg.Internal) Server {
 	//set mode
 	gin.SetMode(gin.DebugMode)
 
 	s := &HTTPServer{
 		config:   config,
+		lock:     &sync.Mutex{},
 		log:      logger,
 		engine:   gin.New(),
 		ctn:      make(map[interface{}]*content.Content),

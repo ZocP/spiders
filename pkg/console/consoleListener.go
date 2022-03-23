@@ -47,6 +47,14 @@ func (l *Listener) Run() {
 				}
 			case "server":
 				switch function {
+				case "reload_cfg":
+					cfg, ok := config.ReadFromFiles(l.Logger)
+					if !ok {
+						l.Info("reloading config not ok")
+					}
+					if err := l.server.ReloadConfig(cfg); err != nil {
+						l.Info("reloading config: ", zap.Error(err))
+					}
 				case "stop":
 					os.Exit(1)
 				default:
