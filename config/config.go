@@ -35,6 +35,7 @@ type Config struct {
 			Longest           int `json:"longest"`
 			Shortest          int `json:"shortest"`
 			MaxArticleResults int `json:"max_article_results"`
+			MaxQAPair         int `json:"max_qa_pair"`
 			//DB DB `json:"db,omitempty"`
 		} `json:"query_qa"`
 	} `json:"services"`
@@ -120,5 +121,5 @@ func setDefault(c *Config) {
 	c.Services.QueryQA.Shortest = 3
 	c.Services.QueryQA.Longest = 20
 	c.Services.QueryQA.MaxArticleResults = 30
-
+	c.Services.QueryQA.MaxQAPair = 5
 }

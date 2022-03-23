@@ -55,14 +55,14 @@ func findMatchesWithTime(find string, ctn *content.Content) []Result {
 			QA:    make([]PairQA, 0),
 		}
 		for _, v2 := range v.QA {
-			if strings.Index(v2.Q, find) > 0 {
+			if strings.Index(v2.Q, find) > 0 && len(result.QA) < ctn.Config.Services.QueryQA.MaxQAPair {
 				result.QA = append(result.QA, PairQA{
 					Q: v2.Q,
 					A: v2.A,
 				})
 				continue
 			}
-			if strings.Index(v2.A, find) > 0 {
+			if strings.Index(v2.A, find) > 0 && len(result.QA) < ctn.Config.Services.QueryQA.MaxQAPair {
 				result.QA = append(result.QA, PairQA{
 					Q: v2.Q,
 					A: v2.A,
