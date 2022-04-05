@@ -77,14 +77,14 @@ func InitHTTPServer(config *config.Config, logger *zap.Logger, internal ...pkg.I
 	//init content services
 
 	//use zap as logger
-	s.engine.Use(ginzap.Ginzap(s.log, time.RFC3339, true))
-
 	if config.Server.AllowCors {
 		logger.Info("Server allow cors enabled")
 		s.engine.Use(Cors())
 	} else {
 		logger.Info("Server allow cors disabled")
 	}
+
+	s.engine.Use(ginzap.Ginzap(s.log, time.RFC3339, true))
 
 	s.regInternal(internal...)
 	//init internal dependencies
