@@ -34,9 +34,18 @@ func QueryWithOption(ctn *content.Content) gin.HandlerFunc {
 				c.JSON(http.StatusOK, services.ErrorResponse(err))
 				return
 			}
+			if len(result) == 0 {
+				c.JSON(http.StatusOK, services.ErrorResponse(fmt.Errorf("no match QA found")))
+				return
+			}
 			c.JSON(http.StatusOK, services.SuccessResponse(result))
 			return
 		case FUZZY:
+			result := fuzzyQuery(ctn, req.Keyword)
+			if result == nil || len(result) == 0 {
+				c.JSON(http.StatusOK, services.ErrorResponse(fmt.Errorf("no match QA found")))
+				return
+			}
 			c.JSON(http.StatusOK, services.SuccessResponse(fuzzyQuery(ctn, req.Keyword)))
 			return
 		default:
