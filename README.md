@@ -13,13 +13,13 @@
 
 ## API
 ###GET 
-(url)/v1/spider/find?key=<要搜索的QA>
+(url)/v1/spider/find?key="要搜索的QA"
 ###POST
 (url)/v1/spider/find
 body:
 {
- "keyword": <your keyword in string>,
-  "option": <your option for how to search>
+ "keyword": "your keyword in string",
+  "option": "your option for how to search in string"
 }
 
 注意，option仅可以为`fuzzy`或`regex`
