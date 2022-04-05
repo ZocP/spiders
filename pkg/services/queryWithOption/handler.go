@@ -46,12 +46,12 @@ func QueryWithOption(ctn *content.Content) gin.HandlerFunc {
 	}
 }
 
-func queryWithRegex(ctn *content.Content, key string) ([]queryQA.Result, error) {
+func queryWithRegex(ctn *content.Content, key string) (res []queryQA.Result, err error) {
 	var resp []queryQA.Result
-	var err error = nil
 	defer func() {
-		err = fmt.Errorf("parsing regex err")
-		recover()
+		if e := recover(); e != nil {
+			err = fmt.Errorf("parsing regex err")
+		}
 	}()
 	compiler := regexp.MustCompile(key)
 	if compiler == nil {
