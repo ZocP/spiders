@@ -10,6 +10,7 @@ import (
 	"qa_spider/config"
 	"qa_spider/pkg"
 	"qa_spider/pkg/services/queryQA"
+	"qa_spider/pkg/services/queryWithOption"
 	"qa_spider/server/content"
 	"sync"
 	"time"
@@ -104,6 +105,7 @@ func (s *HTTPServer) initContent() {
 //router initialize
 func (s *HTTPServer) regHandlers() {
 	s.engine.GET("v1/spider/find", queryQA.QueryQA(s.ctn["qa_spider"]))
+	s.engine.POST("v1/spider/find", queryWithOption.QueryWithOption(s.ctn["qa_spider"]))
 }
 
 //initial internal dependencies

@@ -25,7 +25,7 @@ func QueryQA(ctn *content.Content) gin.HandlerFunc {
 		ctn.Debug("request key", zap.Int("len", len(kw)))
 		length := utf8.RuneCountInString(kw)
 		if length < ctn.Config.Services.QueryQA.Shortest || length > ctn.Config.Services.QueryQA.Longest {
-			ctx.JSON(http.StatusBadRequest, services.ErrorResponse(fmt.Errorf("too short or too long keyword")))
+			ctx.JSON(http.StatusOK, services.ErrorResponse(fmt.Errorf("too short or too long keyword")))
 			return
 		}
 
@@ -80,6 +80,6 @@ func findMatchesWithTime(find string, ctn *content.Content) []Result {
 		r = append(r, result)
 	}
 	end := time.Now()
-	ctn.Debug("	time used:", zap.Int64("in milliseconds", end.UnixMilli()-begin.UnixMilli()))
+	ctn.Debug("regular search time used:", zap.Int64("in milliseconds", end.UnixMilli()-begin.UnixMilli()))
 	return r
 }

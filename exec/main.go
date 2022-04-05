@@ -76,5 +76,6 @@ func InitLogger() *zap.Logger {
 	coreArr = append(coreArr, infoFileCore)
 	coreArr = append(coreArr, errorFileCore)
 	log := zap.New(zapcore.NewTee(coreArr...), zap.AddCaller())
+	zap.ReplaceGlobals(log)
 	return log
 }
