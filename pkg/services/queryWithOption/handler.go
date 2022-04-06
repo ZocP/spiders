@@ -64,7 +64,7 @@ func queryWithRegex(ctn *content.Content, key string) (res []queryQA.Result, err
 	}()
 	compiler := regexp.MustCompile(key)
 	if compiler == nil {
-		return nil, fmt.Errorf("illegal regex, please use the golang version of regex on https://regex101.com/")
+		return nil, fmt.Errorf("illegal regex")
 	}
 
 	articles := ctn.Data[0].(qa.Spider).GetAllQA()
