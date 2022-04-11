@@ -22,11 +22,14 @@ func QueryWithOption(ctn *content.Content) gin.HandlerFunc {
 			c.JSON(http.StatusOK, services.ErrorResponse(fmt.Errorf("error format of JSON")))
 			return
 		}
+
 		length := utf8.RuneCountInString(req.Keyword)
 		if length < ctn.Config.Services.QueryQA.Shortest || length > ctn.Config.Services.QueryQA.Longest {
 			c.JSON(http.StatusOK, services.ErrorResponse(fmt.Errorf("too short or too long keyword")))
 			return
 		}
+		ctn.Debug("request key", zap.String("key, option", req.Keyword+","+req.Option))
+		ctn.Debug("request keyword", zap.Int("len", length))
 		switch req.Option {
 		case REGEX:
 			result, err := queryWithRegex(ctn, req.Keyword)

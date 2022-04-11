@@ -21,14 +21,13 @@ func QueryQA(ctn *content.Content) gin.HandlerFunc {
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, services.ErrorResponse(err))
 		}
-		ctn.Debug("request key", zap.String("key", kw))
-		ctn.Debug("request key", zap.Int("len", len(kw)))
 		length := utf8.RuneCountInString(kw)
 		if length < ctn.Config.Services.QueryQA.Shortest || length > ctn.Config.Services.QueryQA.Longest {
 			ctx.JSON(http.StatusOK, services.ErrorResponse(fmt.Errorf("too short or too long keyword")))
 			return
 		}
-
+		ctn.Debug("request key", zap.String("key", kw))
+		ctn.Debug("request key", zap.Int("len", length))
 		if kw == "小伙伴你好" {
 			ctx.JSON(http.StatusOK, services.SuccessResponse("YBB"))
 			return
