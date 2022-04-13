@@ -33,6 +33,7 @@ func QueryWithOption(ctn *content.Content) gin.HandlerFunc {
 		switch req.Option {
 		case REGEX:
 			result, err := queryWithRegex(ctn, req.Keyword)
+			ctn.Debug("regex matches found", zap.Int("result found", len(result)))
 			if err != nil {
 				c.JSON(http.StatusOK, services.ErrorResponse(err))
 				return
@@ -45,7 +46,9 @@ func QueryWithOption(ctn *content.Content) gin.HandlerFunc {
 			return
 		case FUZZY:
 			result := fuzzyQuery(ctn, req.Keyword)
+			ctn.Debug("fuzzy matches found", zap.Int("result found", len(result)))
 			if result == nil || len(result) == 0 {
+
 				c.JSON(http.StatusOK, services.ErrorResponse(fmt.Errorf("no match QA found")))
 				return
 			}
