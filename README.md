@@ -10,7 +10,6 @@
 配置文件: `./files/cfg.json`
 生成的QA文件: `./files/spider/`
 
-
 ## API
 ### GET 
 (url)/v1/spider/find?key="要搜索的QA"
